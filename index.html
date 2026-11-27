@@ -4,118 +4,229 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>工業配線丙級 學科刷題</title>
-<meta name="theme-color" content="#14213d">
+<meta name="theme-color" content="#1f2a33">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f4f1ea;--card:#fffdf8;--ink:#1d1d1f;--mut:#6b6b70;--line:#e3ddd0;--pri:#14213d;--acc:#e07a1f;--ok:#2f8f4e;--okbg:#e5f4ea;--bad:#c0392b;--badbg:#fbe7e4}
-@media (prefers-color-scheme:dark){:root{--bg:#121417;--card:#1b1e23;--ink:#ececec;--mut:#9a9ca3;--line:#2c3037;--pri:#9bb4ff;--acc:#f0a050;--okbg:#17321f;--badbg:#3a1a17}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;line-height:1.6;-webkit-tap-highlight-color:transparent}
-.wrap{max-width:720px;margin:0 auto;padding:16px 16px 96px}
-header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
-header h1{font-size:18px;margin:0;letter-spacing:.5px}
-header h1 small{display:block;font-size:12px;color:var(--mut);font-weight:400}
-.btn{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:10px 14px;font:inherit;font-size:15px;cursor:pointer}
-.btn.pri{background:var(--pri);color:var(--bg);border-color:var(--pri);font-weight:600}
-.btn.ghost{background:transparent}
+/* VOICE: 工場盤箱的實用感，清楚、穩、好按
+   IDEA: 配電盤面板 — 深色盤面、銘板、指示燈
+   PICTURE: 首頁上方的盤面儀表區（三顆指示燈＋三個計數）
+   COLOUR: 盤面深灰 + RAL7035 淺灰底，指示燈綠/紅/黃，各工作項目各一色
+   TYPE: Noto Sans TC 內文、Barlow Condensed 數字；LAYOUT: 單欄，手機優先 */
+:root{color-scheme:light dark;
+--bg:light-dark(#e9ebe8,#0f1418);--card:light-dark(#ffffff,#192127);--ink:light-dark(#1a2228,#e6eaec);--mut:light-dark(#5d6970,#93a1a8);--line:light-dark(#d4d9d6,#2a343b);
+--panel:#1f2a33;--panel2:#2a3742;--plate:#eef0ec;
+--ok:#1f9d55;--okbg:light-dark(#e3f5ea,#123222);--bad:#d64535;--badbg:light-dark(#fbe6e3,#3a1714);--amb:#f0a020;
+--s01:#2f74c0;--s02:#d4801a;--s03:#159a8c}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:clip}
+.num{font-family:"Barlow Condensed","Noto Sans TC",sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 110px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--amb);outline-offset:2px}
+
+/* 盤面 */
+.panel{background:var(--panel);color:#e8ecee;padding:22px 18px 20px;margin:0 -16px 0;border-radius:0 0 22px 22px;position:relative;overflow:hidden}
+@media(min-width:792px){.panel{margin:0;border-radius:0 0 22px 22px}}
+.panel::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0 46px,rgba(255,255,255,.025) 46px 47px);pointer-events:none}
+.screws{position:absolute;inset:10px;pointer-events:none}
+.screws i{position:absolute;width:9px;height:9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#8a979f,#47535b);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.screws i:nth-child(1){left:0;top:0}.screws i:nth-child(2){right:0;top:0}
+.badge{display:inline-block;font-size:12px;background:#f0a020;color:#1f2a33;font-weight:700;border-radius:4px;padding:1px 8px;margin-bottom:8px}
+.panel h1{margin:0;font-size:clamp(26px,6vw,36px);line-height:1.12;font-weight:900;letter-spacing:.5px;text-wrap:balance}
+.panel .sub{color:#a9b6bd;font-size:13.5px;margin-top:6px}
+.meters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:18px;position:relative}
+.meter{background:var(--panel2);border-radius:14px;padding:12px 12px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 rgba(0,0,0,.25)}
+.lamp{width:14px;height:14px;border-radius:50%;margin-bottom:8px;box-shadow:0 0 0 3px rgba(0,0,0,.25)}
+.lamp.g{background:radial-gradient(circle at 35% 35%,#9ff0bd,#1f9d55 60%);box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 12px #1f9d5599}
+.lamp.y{background:radial-gradient(circle at 35% 35%,#ffe2a0,#f0a020 60%);box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 12px #f0a02099}
+.lamp.r{background:radial-gradient(circle at 35% 35%,#ffb4aa,#d64535 60%);box-shadow:0 0 0 3px rgba(0,0,0,.25),0 0 12px #d6453599}
+.lamp.off{background:#3a4650;box-shadow:0 0 0 3px rgba(0,0,0,.25)}
+.meter b{display:block;font-size:30px;line-height:1;color:#fff}
+.meter b small{font-size:16px;color:#8fa0a8}
+.meter span{font-size:12.5px;color:#a9b6bd}
+
+h2{font-size:19px;margin:28px 2px 4px;font-weight:700}
+.lead{color:var(--mut);font-size:14px;margin:0 2px 12px}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:18px}
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13.5px}
+.step b{display:block;font-size:22px;line-height:1;color:var(--amb)}
+@media(max-width:520px){.steps{grid-template-columns:1fr}.step{display:flex;gap:10px;align-items:baseline}}
+
+/* 銘板（工作項目） */
+.secs{display:flex;flex-direction:column;gap:10px}
+.sec{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;width:100%;padding:14px;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer;position:relative}
+.sec .no{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;color:#fff;font-size:24px;font-weight:700}
+.sec h3{margin:0;font-size:16.5px;line-height:1.3}
+.sec p{margin:3px 0 8px;color:var(--mut);font-size:13.5px;line-height:1.55}
+.sec .tip{font-size:12.5px;color:var(--ink);background:color-mix(in srgb,var(--c) 10%,transparent);border-radius:8px;padding:4px 8px;display:inline-block}
+.sec .ck{width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:grid;place-items:center;font-size:15px;color:#fff}
+.sec.on{border-color:var(--c)}
+.sec.on .ck{background:var(--c);border-color:var(--c)}
+.prog{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mut);margin-top:8px}
+.prog .tr{flex:1;height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.prog .tr i{display:block;height:100%;background:var(--c)}
+
+/* 模式 */
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.mode{text-align:left;padding:13px 14px;border-radius:16px;border:2px solid var(--line);background:var(--card);cursor:pointer}
+.mode b{display:block;font-size:16px}
+.mode span{display:block;color:var(--mut);font-size:13px;line-height:1.5;margin-top:2px}
+.mode.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opts-box{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;margin-top:10px}
+.sw{display:flex;align-items:center;gap:10px;font-size:14.5px;cursor:pointer;min-height:36px}
+.sw input{width:20px;height:20px;accent-color:var(--panel)}
+input[type=range]{width:100%;accent-color:var(--amb)}
+.go{width:100%;margin-top:16px;padding:16px;border-radius:16px;border:0;background:var(--panel);color:#fff;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 3px 0 #0b1015}
+.go .lamp{margin:0}
+.go:active{transform:translateY(2px);box-shadow:0 1px 0 #0b1015}
+.foot{text-align:center;color:var(--mut);font-size:12.5px;margin-top:22px}
+.link{background:none;border:0;color:var(--mut);text-decoration:underline;cursor:pointer;font-size:13px;padding:8px}
+
+/* 做題 */
+.qtop{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 0 8px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-size:15px;cursor:pointer;min-height:44px}
+.btn.pri{background:var(--panel);color:#fff;border-color:var(--panel);font-weight:700}
 .btn:disabled{opacity:.4;cursor:default}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
-.sec-t{font-size:13px;color:var(--mut);margin:18px 2px 8px;letter-spacing:1px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.chip{display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:12px 14px;border-radius:14px;border:1.5px solid var(--line);background:var(--card);cursor:pointer;font:inherit;color:inherit}
-.chip b{font-size:15px}.chip span{font-size:12px;color:var(--mut)}
-.chip.on{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 20%,transparent)}
-.stats{display:flex;gap:10px;flex-wrap:wrap}
-.stat{flex:1;min-width:90px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
-.stat b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.stat span{font-size:12px;color:var(--mut)}
-.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin:6px 0 14px}
-.bar i{display:block;height:100%;background:var(--acc);transition:width .2s}
-.qmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
-.stem{font-size:18px;margin:6px 0 12px;font-weight:500}
-.fig{background:#fff;border-radius:10px;padding:8px;margin-bottom:12px;border:1px solid var(--line);text-align:center}
+.score{font-size:14px;color:var(--mut)}
+.score b{color:var(--ink);font-size:18px}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--amb);transition:width .2s}
+.qcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;border-top:5px solid var(--c)}
+.qmeta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;color:var(--mut);margin-bottom:6px}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--c)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+.stem{font-size:18.5px;line-height:1.6;margin:4px 0 14px;font-weight:500}
+.fig{background:#fff;border-radius:12px;padding:10px;margin-bottom:14px;border:1px solid var(--line);text-align:center}
 .fig img{max-width:100%;max-height:220px;width:auto;height:auto;display:block;margin:0 auto}
-.opts{display:flex;flex-direction:column;gap:8px}
-.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;padding:13px 14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:inherit;font:inherit;font-size:16px;cursor:pointer}
-.opt .k{font-weight:700;color:var(--acc);min-width:1.3em}
-.opt.ok{border-color:var(--ok);background:var(--okbg)}
-.opt.bad{border-color:var(--bad);background:var(--badbg)}
-.opt.pick{border-color:var(--pri)}
+.fig small{display:block;color:#6b7780;font-size:12px;margin-top:4px}
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;width:100%;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-size:16.5px;cursor:pointer;min-height:54px}
+.opt .k{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--bg);font-weight:700;font-size:15px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}.opt.ok .k{background:var(--ok);color:#fff}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}.opt.bad .k{background:var(--bad);color:#fff}
+.opt.pick{border-color:var(--panel)}.opt.pick .k{background:var(--panel);color:#fff}
 .opt:disabled{cursor:default}
-.oimg{max-height:72px;max-width:75%;background:#fff;border-radius:6px;padding:4px}.oimg.sm{max-height:44px;vertical-align:middle}.opt{align-items:center}
-.oimg{max-height:72px;max-width:75%;background:#fff;border-radius:6px;padding:4px}.oimg.sm{max-height:44px;vertical-align:middle}.opt{align-items:center}
-.fb{margin-top:12px;font-weight:600}.fb.ok{color:var(--ok)}.fb.bad{color:var(--bad)}
+.oimg{max-height:76px;max-width:78%;background:#fff;border-radius:8px;padding:4px}
+.oimg.sm{max-height:44px;vertical-align:middle}
+.fb{margin-top:14px;padding:10px 12px;border-radius:12px;font-weight:700;display:flex;gap:8px;align-items:center}
+.fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
+.hint{color:var(--mut);font-size:12.5px;text-align:center;margin-top:10px}
 .dock{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
-.dock .in{max-width:720px;margin:0 auto;display:flex;gap:8px;justify-content:space-between;align-items:center}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.res-big{font-size:48px;font-weight:800;text-align:center;margin:6px 0}
-.rv{border-top:1px solid var(--line);padding:12px 0}
-.rv:first-child{border-top:0}
-.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--line);color:var(--mut);margin-right:6px}
+.dock .in{max-width:760px;margin:0 auto;display:flex;gap:8px;justify-content:space-between}
+.dock .btn{flex:1}.dock .btn.pri{flex:1.6}
+
+/* 結果 */
+.res{background:var(--panel);color:#fff;border-radius:20px;padding:22px;text-align:center;margin-top:8px}
+.res .big{font-size:72px;line-height:1;font-weight:700}
+.res .mut{color:#a9b6bd}
+.res .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.res .btn{background:var(--panel2);color:#fff;border-color:transparent}
+.res .btn.pri{background:#f0a020;color:#1f2a33;border-color:#f0a020}
+.bysec{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:16px;text-align:left}
+.bysec div{background:var(--panel2);border-radius:12px;padding:8px 10px;font-size:12.5px;color:#a9b6bd;border-left:4px solid var(--c)}
+.bysec b{display:block;color:#fff;font-size:20px}
+.rv{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--c);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.rv .q{font-weight:500}
+.rv .a{font-size:14px;margin-top:6px}
+.rv .a.mine{color:var(--bad)}.rv .a.right{color:var(--ok);font-weight:700}
 .hide{display:none!important}
-.mut{color:var(--mut);font-size:13px}
-label.sw{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--mut)}
-input[type=range]{width:100%}
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}.mbox{background:var(--card);border-radius:16px;padding:18px;max-width:360px;width:100%;border:1px solid var(--line)}
-.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--pri);color:var(--bg);padding:10px 16px;border-radius:99px;z-index:9;font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+.mbox{background:var(--card);border-radius:18px;padding:20px;max-width:360px;width:100%}
+.mbox .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--panel);color:#fff;padding:10px 18px;border-radius:99px;z-index:9;font-size:14px}
+@media (prefers-reduced-motion:no-preference){.lamp.g,.lamp.y{animation:glow 2.4s ease-in-out infinite}@keyframes glow{50%{filter:brightness(1.18)}}}
 </style>
 </head>
 <body>
 <div class="wrap" id="app"></div>
 <div class="dock hide" id="dock"><div class="in" id="dockIn"></div></div>
 <script>
+{
 const DATA = {"sections": {"01": "識圖與繪圖", "02": "電氣器具之裝置", "03": "電氣器具之使用"}, "questions": [{"sec": "01", "n": 1, "ans": 1, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之電驛線圈", "沒有機械連鎖之電驛線圈", "接於直流之電驛線圈", "接於交流之電驛線圈"], "img": "img/01-01.png"}, {"sec": "01", "n": 2, "ans": 4, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之電驛線圈", "沒有機械連鎖之電驛線圈", "接於直流之電驛線圈", "接於交流之電驛線圈"], "img": "img/01-02.png"}, {"sec": "01", "n": 3, "ans": 4, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之常閉接點", "能延時動作的常閉接點", "極限開關的常開接點", "極限開關的常閉接點"], "img": "img/01-03.png"}, {"sec": "01", "n": 4, "ans": 2, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之常開接點", "能延時復歸的常開接點", "常開接點", "常閉接點"], "img": "img/01-04.png"}, {"sec": "01", "n": 5, "ans": 3, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之常開接點", "能延時動作的常開接點", "按鈕開關的常開接點", "按鈕開關的常閉接點"], "img": "img/01-05.png"}, {"sec": "01", "n": 6, "ans": 4, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["有機械連鎖之常閉接點", "能延時動作的常閉接點", "緊急停止用之常開接點", "緊急停止用之常閉接點"], "img": "img/01-06.png"}, {"sec": "01", "n": 7, "ans": 1, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["拉動以啟閉之常閉接點", "轉動以啟閉之常閉接點", "能延時動作之常閉接點", "緊急停止用之常閉接點"], "img": "img/01-07.png"}, {"sec": "01", "n": 8, "ans": 2, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["拉動以啟閉之常開接點", "轉動以啟閉之常開接點", "能延時動作之常開接點", "緊急停止用之常開接點"], "img": "img/01-08.png"}, {"sec": "01", "n": 9, "ans": 4, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["指示燈", "電阻", "線圈", "蜂鳴器"], "img": "img/01-09.png"}, {"sec": "01", "n": 10, "ans": 2, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["蜂鳴器", "能閃爍的指示燈", "接交流電之電磁鐵", "接於交流之電驛線圈"], "img": "img/01-10.png"}, {"sec": "01", "n": 11, "ans": 3, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["指示燈", "蜂鳴器", "電驛之線圈", "栓型保險絲"], "img": "img/01-11.png"}, {"sec": "01", "n": 12, "ans": 4, "stem": "線圈符號旁加註TC者為", "opts": ["投入線圈", "動作線圈", "記憶線圈", "跳脫線圈"], "img": null}, {"sec": "01", "n": 13, "ans": 2, "stem": "左圖所示之符號為", "opts": ["電磁電驛線圈", "感應電動機", "同步電動機", "交流電流表"], "img": "img/01-13.png"}, {"sec": "01", "n": 14, "ans": 3, "stem": "如左圖所示之符號為", "opts": ["交流電動機", "直流電動機", "直流發電機", "交流發電機"], "img": "img/01-14.png"}, {"sec": "01", "n": 15, "ans": 2, "stem": "如左圖所示之符號為", "opts": ["直流發電機", "交流發電機", "直流電動機", "接地電壓表"], "img": "img/01-15.png"}, {"sec": "01", "n": 16, "ans": 1, "stem": "如下圖所示之符號為", "opts": ["繞線型感應電動機", "鼠籠型感應電動機", "感應發電機", "同步發電機"], "img": "img/01-16.png"}, {"sec": "01", "n": 17, "ans": 2, "stem": "零相比流器之符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-17-1.png", "img/01-17-2.png", "img/01-17-3.png", "img/01-17-4.png"]}, {"sec": "01", "n": 18, "ans": 1, "stem": "如左圖所示之符號為", "opts": ["無效功率表", "有效功率表", "視在電力表", "功因表"], "img": "img/01-18.png"}, {"sec": "01", "n": 19, "ans": 3, "stem": "如左圖所示之符號為", "opts": ["功率表", "瓦時表", "功率因數表", "無效功因表"], "img": "img/01-19.png"}, {"sec": "01", "n": 20, "ans": 2, "stem": "如左圖所示之符號為", "opts": ["電流表", "伏特表", "功因表", "瓦特表"], "img": "img/01-20.png"}, {"sec": "01", "n": 21, "ans": 1, "stem": "下列符號何者為電解質電容器？", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-21-1.png", "img/01-21-2.png", "img/01-21-3.png", "img/01-21-4.png"]}, {"sec": "01", "n": 22, "ans": 4, "stem": "如左圖所示之符號為", "opts": ["紅色指示燈", "白色指示燈", "黃色指示燈", "綠色指示燈"], "img": "img/01-22.png"}, {"sec": "01", "n": 23, "ans": 3, "stem": "如左圖所示之符號為", "opts": ["單極單投開關", "三極雙投開關", "三極單投開關", "單極雙投開關"], "img": "img/01-23.png"}, {"sec": "01", "n": 24, "ans": 4, "stem": "下列何者為雙極雙投之開關符號？", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-24-1.png", "img/01-24-2.png", "img/01-24-3.png", "img/01-24-4.png"]}, {"sec": "01", "n": 25, "ans": 3, "stem": "如下圖所示之符號為", "opts": ["電磁開關b接點", "電磁開關a接點", "按鈕開關a接點", "按鈕開關b接點"], "img": "img/01-25.png"}, {"sec": "01", "n": 26, "ans": 2, "stem": "如下圖所示之符號為", "opts": ["通電延時動作電驛a接點", "斷電延時復歸電驛a接點", "手動復歸b接點", "殘留a接點"], "img": "img/01-26.png"}, {"sec": "01", "n": 27, "ans": 3, "stem": "如下圖所示之符號為", "opts": ["a接點", "b接點", "熱動a接點", "限時復歸a接點"], "img": "img/01-27.png"}, {"sec": "01", "n": 28, "ans": 2, "stem": "如左圖所示之符號為", "opts": ["限時動作接點", "殘留接點", "手捺開關接點", "自動復歸接點"], "img": "img/01-28.png"}, {"sec": "01", "n": 29, "ans": 1, "stem": "限制開關（Limit Switch）之常開接點（N.O）符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-29-1.png", "img/01-29-2.png", "img/01-29-3.png", "img/01-29-4.png"]}, {"sec": "01", "n": 30, "ans": 2, "stem": "如左圖所示之符號為何種開關之接點？", "opts": ["按鈕開關", "限制開關", "光電開關", "切換開關"], "img": "img/01-30.png"}, {"sec": "01", "n": 31, "ans": 1, "stem": "自動電壓調節器之英文縮寫符號為", "opts": ["AVR", "PCB", "ACB", "OCB"], "img": null}, {"sec": "01", "n": 32, "ans": 3, "stem": "避雷器之英文縮寫為", "opts": ["RC", "SC", "LA", "TB"], "img": null}, {"sec": "01", "n": 33, "ans": 1, "stem": "接線端子台的英文縮寫符號為", "opts": ["TB", "PB", "ACB", "COS"], "img": null}, {"sec": "01", "n": 34, "ans": 4, "stem": "限制開關的英文縮寫符號為", "opts": ["BS", "PS", "SS", "LS"], "img": null}, {"sec": "01", "n": 35, "ans": 4, "stem": "直流的英文縮寫符號為", "opts": ["AC", "BC", "CC", "DC"], "img": null}, {"sec": "01", "n": 36, "ans": 1, "stem": "如下圖所示之符號為", "opts": ["按鈕開關接點", "限制開關接點", "閃爍電驛接點", "限時電驛接點"], "img": "img/01-36.png"}, {"sec": "01", "n": 37, "ans": 2, "stem": "電路圖中，如下圖所示之符號為", "opts": ["電阻器", "積熱電驛", "熱敏電阻", "輔助電驛"], "img": "img/01-37.png"}, {"sec": "01", "n": 38, "ans": 2, "stem": "如下圖所示之符號為", "opts": ["電磁開關a接點", "電磁開關b接點", "按鈕開關a接點", "按鈕開關b接點"], "img": "img/01-38.png"}, {"sec": "01", "n": 39, "ans": 2, "stem": "變壓器之符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-39-1.png", "img/01-39-2.png", "img/01-39-3.png", "img/01-39-4.png"]}, {"sec": "01", "n": 40, "ans": 2, "stem": "如下圖所示之符號為", "opts": ["可調電阻器", "可調自耦變壓器", "電鈴", "蜂鳴器"], "img": "img/01-40.png"}, {"sec": "01", "n": 41, "ans": 4, "stem": "電子裝置中，圖中符號表示", "opts": ["電晶體", "整流二極體", "放大器", "穩壓二極體"], "img": "img/01-41.png"}, {"sec": "01", "n": 42, "ans": 1, "stem": "如左圖所示之符號為", "opts": ["保險絲", "電阻", "線圈", "電驛"], "img": "img/01-42.png"}, {"sec": "01", "n": 43, "ans": 1, "stem": "左圖所示之符號為", "opts": ["接地", "短路", "斷路", "中性線"], "img": "img/01-43.png"}, {"sec": "01", "n": 44, "ans": 4, "stem": "如左圖所示之符號為", "opts": ["驅動線圈", "電磁接觸器", "磁場線圈", "比流器"], "img": "img/01-44.png"}, {"sec": "01", "n": 45, "ans": 4, "stem": "如左圖所示之符號為", "opts": ["SCR", "UJT", "NPN晶體", "PNP晶體"], "img": "img/01-45.png"}, {"sec": "01", "n": 46, "ans": 1, "stem": "如下圖所示氣壓控制閥，其型式為", "opts": ["四孔二位閥", "四孔三位閥", "五孔二位閥", "五孔三位閥"], "img": "img/01-46.png"}, {"sec": "01", "n": 47, "ans": 2, "stem": "通電開始計時的延時電驛，其計時到接點斷開的接點符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-47-1.png", "img/01-47-2.png", "img/01-47-3.png", "img/01-47-4.png"]}, {"sec": "01", "n": 48, "ans": 4, "stem": "限制開關LS未受到碰觸時，其內部b接點的電路符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-48-1.png", "img/01-48-2.png", "img/01-48-3.png", "img/01-48-4.png"]}, {"sec": "01", "n": 49, "ans": 3, "stem": "如下圖所示IEC國際標準符號為", "opts": ["限時動作之常開接點", "緊急停止用之常閉接點", "積熱過載保護電驛常開接點", "轉動以啟閉之常開接點"], "img": "img/01-49.png"}, {"sec": "01", "n": 50, "ans": 3, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["電磁接觸器輔助常開接點", "電磁接觸器線圈", "電磁接觸器輔助常閉接點", "輔助電驛常開接點"], "img": "img/01-50.png"}, {"sec": "01", "n": 51, "ans": 1, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["限時電驛線圈", "輔助電驛線圈", "指示燈", "溫度開關線"], "img": "img/01-51.png"}, {"sec": "01", "n": 52, "ans": 2, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["限時電驛通電延時常閉接點", "限時電驛通電延時常開接點", "限時電驛斷電延時常閉接點", "限時電驛斷電延時常開接點"], "img": "img/01-52.png"}, {"sec": "01", "n": 53, "ans": 1, "stem": "如下圖所示，IEC國際標準符號為", "opts": ["限時電驛通電延時常閉接點", "限時電驛通電延時常開接點", "限時電驛斷電延時常閉接點", "限時電驛斷電延時常開接點"], "img": "img/01-53.png"}, {"sec": "01", "n": 54, "ans": 4, "stem": "下圖為兩只電磁接觸器（KM1、KM2）主接點符號，中間虛線及▽符號代表兩只電磁接觸器", "opts": ["通電延時", "電器連鎖", "斷電延時", "機械連鎖"], "img": "img/01-54.png"}, {"sec": "01", "n": 55, "ans": 2, "stem": "如下圖所示為電動機保護斷路器之IEC符號，此斷路器具有下列何保護功能", "opts": ["短路、延時", "短路、過載", "延時、過載", "跳脫、變頻"], "img": "img/01-55.png"}, {"sec": "01", "n": 56, "ans": 3, "stem": "閃爍電驛a接點的符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/01-56-1.png", "img/01-56-2.png", "img/01-56-3.png", "img/01-56-4.png"]}, {"sec": "01", "n": 57, "ans": 3, "stem": "如下圖所示為電動機保護斷路器之IEC符號，其操作方式為", "opts": ["自動切換自動跳脫", "自動切換手動跳脫", "手動切換自動跳脫", "手動切換手動跳脫"], "img": "img/01-57.png"}, {"sec": "01", "n": 58, "ans": 2, "stem": "如下圖所示氣壓控制閥，其型式為", "opts": ["五口三位中位全開並附手動開關", "五口三位中位全閉並附手動開關", "三口五位中位全閉並附手動開關", "三口五位中位全開並附手動開關"], "img": "img/01-58.png"}, {"sec": "01", "n": 59, "ans": 3, "stem": "如下圖所示氣壓控制閥，其型式為", "opts": ["二口五位自動復歸", "三口五位中位全閉", "五口二位自動復歸", "五口三位中位全閉"], "img": "img/01-59.png"}, {"sec": "01", "n": 60, "ans": 3, "stem": "如右圖所示之符號為", "opts": ["三相三線△接法", "三相三線Y接法", "三相三線△接法，一線（相）接地", "三相四線Y接法"], "img": "img/01-60.png"}, {"sec": "01", "n": 61, "ans": 1, "stem": "如右圖根據IEC國際標準符號所示為", "opts": ["可變電阻器", "固定電阻器", "可調自耦變壓器", "變壓器"], "img": "img/01-61.png"}, {"sec": "02", "n": 1, "ans": 3, "stem": "使用中心沖的作用為", "opts": ["測距離", "鑽孔", "定位", "攻牙"], "img": null}, {"sec": "02", "n": 2, "ans": 2, "stem": "水平儀的用途為", "opts": ["劃垂直線", "檢查水平度", "檢查直角度", "劃圓形"], "img": null}, {"sec": "02", "n": 3, "ans": 1, "stem": "在配電盤箱上劃線時，可使用工具為", "opts": ["石墨筆", "銼刀", "起子", "劃線針"], "img": null}, {"sec": "02", "n": 4, "ans": 1, "stem": "使用鑽床時，調整鑽台高度使鑽頭與材料之距離約", "opts": ["10～20mm", "40～50mm", "80～90mm", "120～150mm"], "img": null}, {"sec": "02", "n": 5, "ans": 2, "stem": "欲攻M4之螺牙，其攻牙前所鑽之孔徑應為", "opts": ["2.6～2.8 φ", "3.0～3.4 φ", "3.6～3.8 φ", "4.0～4.2 φ"], "img": null}, {"sec": "02", "n": 6, "ans": 4, "stem": "螺絲攻其第一攻、第二攻、第三攻的區別", "opts": ["牙距之大小", "牙距之深淺", "孔之大小", "倒角牙紋數之多少"], "img": null}, {"sec": "02", "n": 7, "ans": 1, "stem": "操作砂輪機時，應配戴", "opts": ["安全眼鏡", "望遠鏡", "隱形眼鏡", "近視眼鏡"], "img": null}, {"sec": "02", "n": 8, "ans": 2, "stem": "牙距越小其固定", "opts": ["越鬆", "越緊", "與鬆緊度無關", "越容易滑牙"], "img": null}, {"sec": "02", "n": 9, "ans": 1, "stem": "木螺絲之規格是依據下列何者而定？", "opts": ["長度", "直徑", "螺紋", "材質"], "img": null}, {"sec": "02", "n": 10, "ans": 3, "stem": "薄鐵板要固定器具最好採用", "opts": ["英制螺絲", "公制螺絲", "螺絲與螺母", "木螺絲"], "img": null}, {"sec": "02", "n": 11, "ans": 4, "stem": "以手電鑽鑽孔，當接近完成時進刀速度應", "opts": ["加快", "維持不變", "切斷電源", "減慢"], "img": null}, {"sec": "02", "n": 12, "ans": 3, "stem": "測試固定螺絲鎖緊的程度是用", "opts": ["固定扳手", "梅花扳手", "扭力扳手", "套筒扳手"], "img": null}, {"sec": "02", "n": 13, "ans": 1, "stem": "平墊片之作用在", "opts": ["增加壓迫面積", "增加機械強度", "增加摩擦損", "減少摩擦損"], "img": null}, {"sec": "02", "n": 14, "ans": 4, "stem": "潮濕的皮膚其電阻會", "opts": ["提高", "失效", "不變", "降低"], "img": null}, {"sec": "02", "n": 15, "ans": 4, "stem": "有關工具使用規則，下列敘述何者正確？", "opts": ["可將鉛管套於扳手柄以增加力矩", "刮刀都是用單手握持的", "螺絲起子可做鑿刀使用", "禁止以甲工具代替乙工具使用"], "img": null}, {"sec": "02", "n": 16, "ans": 1, "stem": "可測量線徑之量具為", "opts": ["測微器、線規、游標尺", "測微器、線規、卷尺", "測微器、游標尺、卷尺", "游標尺、線規、卷尺"], "img": null}, {"sec": "02", "n": 17, "ans": 3, "stem": "1'（呎）是幾英吋？", "opts": ["8\"", "10\"", "12\"", "16\""], "img": null}, {"sec": "02", "n": 18, "ans": 2, "stem": "1\"（英寸）是幾 mm？", "opts": ["2.54", "25.4", "3.54", "35.4"], "img": null}, {"sec": "02", "n": 19, "ans": 4, "stem": "測量光線明亮程度的儀表為", "opts": ["示波器", "頻率表", "轉速表", "照度表"], "img": null}, {"sec": "02", "n": 20, "ans": 2, "stem": "測量電磁接觸器之接點是否正常，不可使用", "opts": ["導通試驗器", "相序計", "三用電表", "數位三用電表"], "img": null}, {"sec": "02", "n": 21, "ans": 4, "stem": "在不通電的情況下，測量電磁接觸器之線圈是否正常，三用電表應撥在", "opts": ["DCV檔", "ACV檔", "DCmA檔", "歐姆檔"], "img": null}, {"sec": "02", "n": 22, "ans": 3, "stem": "使用三用電表測量電壓時", "opts": ["需作0調整", "不必注意其為交流或直流", "將電壓檔位先調至最高檔", "不必注意指針之零點"], "img": null}, {"sec": "02", "n": 23, "ans": 2, "stem": "指針型電表面板上設置鏡面（刻度下方成扇形）是為了避免下列何者之誤差？", "opts": ["儀器", "人為", "環境", "電路"], "img": null}, {"sec": "02", "n": 24, "ans": 1, "stem": "一般配置圖上器具位置之標示線為器具之", "opts": ["中心線", "右側邊線", "左側邊線", "底線"], "img": null}, {"sec": "02", "n": 25, "ans": 4, "stem": "固定配電器具時", "opts": ["沒有方向性之限制", "必須向右對齊", "必須向左對齊", "依圖示及器具說明固定之"], "img": null}, {"sec": "02", "n": 26, "ans": 4, "stem": "在DIN軌道上固定組合式端子台時，則", "opts": ["所有端台必須具相同規格", "只能裝置兩種不同規格之端子台", "只能裝置同一規格之一般端子台及不同規格之接地端子台", "必須裝末端固定板"], "img": null}, {"sec": "02", "n": 27, "ans": 4, "stem": "一般三用電表不能直接量測下列何者？", "opts": ["直流電壓", "交流電壓", "直流電流", "交流電流"], "img": null}, {"sec": "02", "n": 28, "ans": 1, "stem": "規格為5.5-6的壓接端子，其中6字是表示", "opts": ["鎖緊用螺絲最大直徑", "端子之總長", "導線的線徑", "剝線的長度"], "img": null}, {"sec": "02", "n": 29, "ans": 1, "stem": "固定電表之螺母應使用的工具為", "opts": ["套筒起子", "尖嘴鉗", "壓接鉗", "鋼絲鉗"], "img": null}, {"sec": "02", "n": 30, "ans": 4, "stem": "使用起子時，則", "opts": ["一字起子刃部要磨尖", "十字起子刃部要磨尖", "十字起子可當一字起子使用", "選擇合適尺寸之起子"], "img": null}, {"sec": "02", "n": 31, "ans": 2, "stem": "使用電工刀，刀口宜向", "opts": ["內", "外", "上", "下"], "img": null}, {"sec": "02", "n": 32, "ans": 3, "stem": "在對金屬工作物加工時，不可注油來潤滑者為", "opts": ["鑽孔", "鉸牙", "銼刀", "鋸削"], "img": null}, {"sec": "02", "n": 33, "ans": 2, "stem": "電磁開關之積熱電驛，用於保護", "opts": ["線路短路", "電動機過載", "接地", "漏電"], "img": null}, {"sec": "02", "n": 34, "ans": 4, "stem": "積熱電驛之額定電流為15A，則其過載電流調整鈕的範圍為", "opts": ["18～26A", "17～24A", "9～15A", "12～18A"], "img": null}, {"sec": "02", "n": 35, "ans": 1, "stem": "安裝選擇開關時，則", "opts": ["必須先檢查接點是否正常", "將墊片分別置於鐵板之兩邊", "不必注意裝置角度", "將不用接線之接點螺絲取下"], "img": null}, {"sec": "02", "n": 36, "ans": 1, "stem": "利用虎鉗夾持已完工之加工面，須下列何種材料作為墊片？", "opts": ["銅", "鐵", "鋼", "破布"], "img": null}, {"sec": "02", "n": 37, "ans": 2, "stem": "裝置無熔線斷路器時，則", "opts": ["將斷路器置於ON位置", "將斷路器置於OFF位置", "將斷路器置於跳脫位置", "將斷路器置於ON位置且用膠布貼牢"], "img": null}, {"sec": "02", "n": 38, "ans": 3, "stem": "裝置限制開關時，則", "opts": ["不必調整其動作距離", "不必調整其動作方向", "應配置或預留接地線", "應加裝防爆安全罩"], "img": null}, {"sec": "02", "n": 39, "ans": 2, "stem": "電晶體組件常用的電烙鐵以", "opts": ["2～5W", "30～40W", "100～150W", "200～300W"], "img": null}, {"sec": "02", "n": 40, "ans": 4, "stem": "下列何者不是電氣火災發生的原因？", "opts": ["由於電荷聚集，產生靜電火花放電，引燃易燃物", "因開關啟斷時所發生的火花，引燃附近的外物", "因電路短路引起高溫", "電流流入人體"], "img": null}, {"sec": "02", "n": 41, "ans": 3, "stem": "電動機、變壓器等設備所引起火災屬於", "opts": ["A類", "B類", "C類", "D類"], "img": null}, {"sec": "02", "n": 42, "ans": 2, "stem": "電烙鐵用完後，應進行下列何項安全步驟？", "opts": ["不必拔掉電源", "拿住插頭拔除電源", "直接握住電烙鐵用力拉離電源即可", "拿住電源線把插頭拉下"], "img": null}, {"sec": "02", "n": 43, "ans": 2, "stem": "配電盤箱做自主檢查時，當操作電氣控制開關前應注意事項為", "opts": ["不必顧慮後端負載情況", "須先確認配電盤箱輸入電源電壓及切離負載", "每次均需重覆操作幾次以確保開關動作確實", "須先投入負載"], "img": null}, {"sec": "02", "n": 44, "ans": 4, "stem": "遇有電氣事故所引起的火災，在未切斷電源前，不宜使用", "opts": ["滅火砂", "二氧化碳滅火器", "乾粉滅火器", "水"], "img": null}, {"sec": "02", "n": 45, "ans": 1, "stem": "危險場所的各接線盒、燈具及金屬管接頭必須用螺紋接合，且為", "opts": ["防爆型", "防塵型", "防水型", "隔音型"], "img": null}, {"sec": "02", "n": 46, "ans": 4, "stem": "選擇滅火器材是依下列何者而定？", "opts": ["起火點", "風向", "氣候", "燃燒物"], "img": null}, {"sec": "02", "n": 47, "ans": 4, "stem": "有關防止易燃氣體爆炸之方法，下列敘述何者錯誤？", "opts": ["防止洩漏", "防止溫度過高", "遠離火種", "減少通風效果"], "img": null}, {"sec": "02", "n": 48, "ans": 2, "stem": "低壓接觸型驗電筆會亮代表", "opts": ["電源電壓異常", "電流通過人體", "電源漏電", "電路電壓失常"], "img": null}, {"sec": "02", "n": 49, "ans": 2, "stem": "人體的電阻比正常接地電阻為", "opts": ["小", "大", "因人而異", "因地而異"], "img": null}, {"sec": "02", "n": 50, "ans": 1, "stem": "工作人員如肢體受傷出血，應將傷部", "opts": ["高舉", "平放", "放低", "頭部朝下"], "img": null}, {"sec": "02", "n": 51, "ans": 2, "stem": "國產指針型三用電表撥在歐姆檔作測量時，紅棒插在「＋」端插孔，黑棒插在「–」端插孔，此時黑棒是與其內部電池", "opts": ["負極接通", "正極接通", "斷路", "短路"], "img": null}, {"sec": "02", "n": 52, "ans": 1, "stem": "某人觸電遇難須搭救時，應先", "opts": ["移開接觸之帶電體", "檢查心臟是否仍在跳動", "檢查呼吸是否正常", "用手拉開遇難者與帶電體後再行急救"], "img": null}, {"sec": "02", "n": 53, "ans": 4, "stem": "有關防止感電，下列何者不宜？", "opts": ["停電作業", "手腳清潔乾燥", "鞋子應為膠鞋且清潔乾燥", "赤腳作業"], "img": null}, {"sec": "02", "n": 54, "ans": 3, "stem": "家庭用之無熔線斷路器較為常用的過載跳脫方式為", "opts": ["完全電磁式", "熱動電磁式", "熱動式", "電子式"], "img": null}, {"sec": "02", "n": 55, "ans": 4, "stem": "換裝保險絲時，應注意下列何種事項？", "opts": ["所使用的保險絲，其電流容量不要過小，以免經常更換", "以鐵絲或銅絲取代，以防再斷", "使用電流容量約等於安全電流3到4倍的保險絲", "遵照電路電流量，選用適宜的保險絲"], "img": null}, {"sec": "02", "n": 56, "ans": 4, "stem": "執行檢修作業中，下列何者為正確的態度？", "opts": ["精神恍惚，打瞌睡", "可談天說話", "可邊工作，邊聽熱門音樂", "遵守各種職業安全衛生相關規定"], "img": null}, {"sec": "02", "n": 57, "ans": 2, "stem": "在器具板上施行盤箱加工，做鑽孔、攻牙時，必須配戴", "opts": ["耳機、安全帽", "耳塞（或耳罩）、護目鏡", "口罩、安全帽", "口罩、護目鏡"], "img": null}, {"sec": "02", "n": 58, "ans": 4, "stem": "在器具板上施行盤箱加工，若要鑽孔時，必須使用", "opts": ["釘槍", "鐵鎚", "攻牙機", "手電鑽"], "img": null}, {"sec": "02", "n": 59, "ans": 3, "stem": "在器具板上施行盤箱加工，鑽孔後，若要攻牙時，必須使用", "opts": ["釘槍", "鐵鎚", "攻牙機", "手電鑽"], "img": null}, {"sec": "02", "n": 60, "ans": 3, "stem": "以O型絕緣端子製作接地線時，應使用壓接工具為", "opts": ["斜口鉗", "電工鉗", "絕緣端子壓接鉗", "切管器"], "img": null}, {"sec": "02", "n": 61, "ans": 3, "stem": "如下圖所示，為液面控制器感測棒E1、E2、E3，其中須接地之感測棒為", "opts": ["E1", "E2", "E3", "任一感測棒"], "img": "img/02-61.png"}, {"sec": "02", "n": 62, "ans": 4, "stem": "套裝O型號碼管時，下列何者正確", "opts": ["號碼管可任意套裝，不必依線號編製套裝", "接有兩條導線的接點，僅套裝一只號碼管即可", "施作號碼管僅需部分套裝，不需全部套裝", "套裝O型號碼管直向裝置時，其標示須全部右視配置或左視配置"], "img": null}, {"sec": "02", "n": 63, "ans": 3, "stem": "套裝O型號碼管時，下列何者正確", "opts": ["可切開號碼管裝置", "號碼管裝置方向，在同一工作盤面中可任意裝置，不必在意", "O型號碼管橫向裝置時，須正視配置", "可任意套裝，不必依線號編製套裝"], "img": null}, {"sec": "02", "n": 64, "ans": 2, "stem": "施作導線壓接時，須使用下列何種工具？", "opts": ["萬用鉗", "具扭力控制壓接鉗", "電工刀", "電纜剪"], "img": null}, {"sec": "02", "n": 65, "ans": 3, "stem": "用電鑽施作盤箱加工時，應在鑽孔處加", "opts": ["汽油", "去漬油", "切削油", "煤油"], "img": null}, {"sec": "02", "n": 66, "ans": 1, "stem": "電纜剝皮時，要使用下列何種工具？", "opts": ["電纜剝皮刀", "萬用鉗", "電工鉗", "壓接鉗"], "img": null}, {"sec": "02", "n": 67, "ans": 2, "stem": "盤箱加工固定器具時，須使用何種螺絲固定？", "opts": ["鋼板螺絲釘", "圓頭螺絲釘", "鐵板牙螺絲釘", "木螺絲釘"], "img": null}, {"sec": "02", "n": 68, "ans": 3, "stem": "盤箱加工以十字螺絲釘固定器具時，須使用何種工具？", "opts": ["尖嘴鉗", "剝線鉗", "十字起子", "一字起子"], "img": null}, {"sec": "02", "n": 69, "ans": 1, "stem": "高感度高速度漏電斷路器之動作時間，當達到額定動作電流時，會在幾秒內動作？", "opts": ["0.1秒", "0.5秒", "1秒", "1.5秒"], "img": null}, {"sec": "02", "n": 70, "ans": 3, "stem": "工場中配電箱前之操作門板開啟工作範圍，應以下列何種顏色標示？", "opts": ["白色", "藍色", "黃色", "綠色"], "img": null}, {"sec": "03", "n": 1, "ans": 4, "stem": "電氣儀表上表示交直流兩用之符號為", "opts": ["", "", "", ""], "img": null, "oimg": ["img/03-01-1.png", "img/03-01-2.png", "img/03-01-3.png", "img/03-01-4.png"]}, {"sec": "03", "n": 2, "ans": 2, "stem": "0.5Class（級）之電表，其允許誤差為", "opts": ["最小刻度之0.5％", "滿刻度之0.5％", "任何指示值的0.5％", "任何指示值的50％"], "img": null}, {"sec": "03", "n": 3, "ans": 3, "stem": "電流表之接法為", "opts": ["與電路並聯", "兩端短路", "與負載串聯", "與電源並聯"], "img": null}, {"sec": "03", "n": 4, "ans": 2, "stem": "如下圖所示，兩只額定100V之電壓表，靈敏度分別為20KΩ／V及40KΩ／V，當串聯接於120V電壓時，兩只電壓表分別指示", "opts": ["20V、100V", "40V、80V", "60V、60V", "80V、40V"], "img": "img/03-04.png"}, {"sec": "03", "n": 5, "ans": 1, "stem": "伏特表之功用在於量測", "opts": ["電壓", "電阻", "功率", "電流"], "img": null}, {"sec": "03", "n": 6, "ans": 1, "stem": "一般交流電壓表所指示的電壓值為", "opts": ["均方根值", "平均值", "最高值", "瞬間值"], "img": null}, {"sec": "03", "n": 7, "ans": 2, "stem": "如下圖所示電路，電壓表V應指示", "opts": ["50VAC", "50VDC", "75VAC", "75VDC"], "img": "img/03-07.png"}, {"sec": "03", "n": 8, "ans": 3, "stem": "兩內阻不同之電壓表 V₁ 及 V₂，如下圖所示之結線，V₂ 之讀數為", "opts": ["50V", "75V", "100V", "150V"], "img": "img/03-08.png"}, {"sec": "03", "n": 9, "ans": 3, "stem": "內阻各為1.5KΩ及1KΩ之兩個滿刻度150V電壓表，若串聯連接時，可測定之最高電壓為", "opts": ["150V", "200V", "250V", "300V"], "img": null}, {"sec": "03", "n": 10, "ans": 4, "stem": "交流電壓表接線時，須考慮", "opts": ["正負方向", "相序", "極性", "量度範圍"], "img": null}, {"sec": "03", "n": 11, "ans": 2, "stem": "直流回路在測試大電流時電表應配合下列何者使用？", "opts": ["倍率器", "分流器", "電抗器", "整流器"], "img": null}, {"sec": "03", "n": 12, "ans": 2, "stem": "要將某直流電流表的指示範圍放大100倍時，所裝分流器的電阻應為電流表內阻的", "opts": ["1/100倍", "1/99倍", "99倍", "100倍"], "img": null}, {"sec": "03", "n": 13, "ans": 1, "stem": "在交流電路中，欲擴大電流之量測範圍，應利用", "opts": ["比流器", "比壓器", "分流器", "倍率器"], "img": null}]};
-const SECS = DATA.sections, ALL = DATA.questions.map(q=>({...q,id:q.sec+'-'+q.n}));
+const ALL = DATA.questions.map(q=>({...q,id:q.sec+'-'+q.n}));
+const SEC = {
+ '01':{name:'識圖與繪圖',c:'var(--s01)',pages:'講義 p.1–6',desc:'看電路符號認器具：接點、線圈、電表、開關、氣壓閥。幾乎都是看圖題。',tip:'先單獨刷這區，把 IEC 符號背熟'},
+ '02':{name:'電氣器具之裝置',c:'var(--s02)',pages:'講義 p.6–10',desc:'工具用法、盤箱加工、號碼管、工安、滅火器分類與觸電急救。偏常識與規定。',tip:'題目最多但最直觀，刷一兩輪就熟'},
+ '03':{name:'電氣器具之使用',c:'var(--s03)',pages:'講義 p.10–11（第 1–13 題）',desc:'電表的接法與計算：電壓表串聯分壓、分流器倍數、有效值。',tip:'有計算題，錯了要回頭想原理'}
+};
+const MODES=[
+ ['seq','依序練習','照講義題號一題一題做，答完立刻對答案。適合第一次讀。'],
+ ['random','隨機刷題','打亂順序把範圍內全部做一遍，避免靠位置記答案。'],
+ ['exam','模擬測驗','隨機抽題，全部作答完才交卷看分數，60 分及格。'],
+ ['wrong','錯題本','只做曾經答錯的題目；在這裡答對就會移出錯題本。']
+];
 const KEY='wiring-c-quiz-v1';
 let store={};try{store=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
-store.s=store.s||{};// id -> {c:correct,w:wrong,wb:inWrongBook}
+store.s=store.s||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}};
 const $=s=>document.querySelector(s), app=$('#app'), dock=$('#dock'), dockIn=$('#dockIn');
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const K='①②③④';
-const oh=(q,i)=>q.oimg?`<img class="oimg sm" src="${q.oimg[i]}" alt="">`:esc(q.opts[i]);
-const ask=(msg)=>new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="mbox"><div style="margin-bottom:14px">${esc(msg)}</div><div class="row" style="justify-content:flex-end"><button class="btn" data-a="0">取消</button><button class="btn pri" data-a="1">確定</button></div></div>`;document.body.appendChild(m);m.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{m.remove();res(b.dataset.a=='1')})});
+const oh=(q,i)=>q.oimg?`<img class="oimg sm" src="${q.oimg[i]}" alt="選項${K[i]}">`:esc(q.opts[i]);
+const ask=(msg)=>new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="mbox"><div>${esc(msg)}</div><div class="row"><button class="btn" data-a="0">取消</button><button class="btn pri" data-a="1">確定</button></div></div>`;document.body.appendChild(m);m.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{m.remove();res(b.dataset.a=='1')})});
 const toast=(msg)=>{const m=document.createElement('div');m.className='toast';m.textContent=msg;document.body.appendChild(m);setTimeout(()=>m.remove(),2200)};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-let cfg={secs:['01','02','03'],mode:'random',n:20,shuf:false};
-try{Object.assign(cfg,store.cfg||{})}catch(e){}
-let S=null; // session
-
-function pool(){return ALL.filter(q=>cfg.secs.includes(q.sec))}
-function wrongs(){return ALL.filter(q=>store.s[q.id]&&store.s[q.id].wb)}
+let cfg={secs:['01','02','03'],mode:'seq',n:40,shuf:false};
+Object.assign(cfg,store.cfg||{});
+const persist=()=>{store.cfg=cfg;save()};
+let S=null;
+const st=q=>store.s[q.id]||{c:0,w:0,wb:false};
+const pool=()=>ALL.filter(q=>cfg.secs.includes(q.sec));
+const wrongs=()=>ALL.filter(q=>st(q).wb);
 
 function home(){
   S=null;dock.classList.add('hide');
-  const done=ALL.filter(q=>store.s[q.id]&&(store.s[q.id].c+store.s[q.id].w)>0).length;
-  const corr=ALL.reduce((a,q)=>a+((store.s[q.id]||{}).c||0),0), tot=ALL.reduce((a,q)=>{const s=store.s[q.id]||{};return a+(s.c||0)+(s.w||0)},0);
-  const wb=wrongs().length;
-  const modes=[['seq','依序練習','照題號一題一題'],['random','隨機刷題','打亂順序全部刷'],['exam','模擬測驗','抽題、做完才看分數'],['wrong','錯題本',wb+' 題待複習']];
+  const done=ALL.filter(q=>st(q).c+st(q).w>0).length;
+  const corr=ALL.reduce((a,q)=>a+st(q).c,0), tot=ALL.reduce((a,q)=>a+st(q).c+st(q).w,0);
+  const acc=tot?Math.round(corr/tot*100):null, wb=wrongs().length;
+  const secCard=k=>{const s=SEC[k],qs=ALL.filter(q=>q.sec==k),d=qs.filter(q=>st(q).c+st(q).w>0).length,w=qs.filter(q=>st(q).wb).length;
+    return `<button class="sec ${cfg.secs.includes(k)?'on':''}" data-s="${k}" style="--c:${s.c}">
+      <span class="no num" style="background:${s.c}">${k}</span>
+      <span><h3>${s.name}</h3><p>${s.desc}</p><span class="tip">建議：${s.tip}</span>
+        <span class="prog"><span class="tr"><i style="width:${d/qs.length*100}%"></i></span><span class="num">${d}/${qs.length}</span>${w?`<span>· 錯 ${w}</span>`:''}</span>
+        <span class="prog" style="margin-top:2px">${s.pages} · 共 ${qs.length} 題</span></span>
+      <span class="ck">${cfg.secs.includes(k)?'✓':''}</span></button>`};
+  const n=pool().length;
   app.innerHTML=`
-  <header><h1>工業配線丙級 學科刷題<small>013003A13 · 工作項目 01–03（講義 p.1–11）· 共 ${ALL.length} 題</small></h1></header>
-  <div class="stats">
-    <div class="stat"><b>${done}/${ALL.length}</b><span>做過的題目</span></div>
-    <div class="stat"><b>${tot?Math.round(corr/tot*100):0}%</b><span>累積正確率</span></div>
-    <div class="stat"><b>${wb}</b><span>錯題本</span></div>
+  <section class="panel">
+    <div class="screws"><i></i><i></i></div>
+    <span class="badge">115 年起適用 · 013003A13</span>
+    <h1>工業配線丙級<br>學科刷題</h1>
+    <div class="sub">技術士技能檢定學科題庫 · 工作項目 01–03（講義第 1–11 頁）· 共 ${ALL.length} 題</div>
+    <div class="meters">
+      <div class="meter"><div class="lamp ${done?'g':'off'}"></div><b class="num">${done}<small>/${ALL.length}</small></b><span>做過的題目</span></div>
+      <div class="meter"><div class="lamp ${acc===null?'off':acc>=60?'g':'r'}"></div><b class="num">${acc===null?'—':acc+'<small>%</small>'}</b><span>累積正確率</span></div>
+      <div class="meter"><div class="lamp ${wb?'y':'off'}"></div><b class="num">${wb}</b><span>錯題本</span></div>
+    </div>
+  </section>
+  <div class="steps">
+    <div class="step"><b class="num">1</b>勾選要練的工作項目</div>
+    <div class="step"><b class="num">2</b>選一種練習模式</div>
+    <div class="step"><b class="num">3</b>按「開始」，錯的會自動進錯題本</div>
   </div>
-  <div class="sec-t">範圍</div>
-  <div class="grid" id="secs">${Object.entries(SECS).map(([k,v])=>`<button class="chip ${cfg.secs.includes(k)?'on':''}" data-s="${k}"><b>工作項目 ${k}</b><span>${v} · ${ALL.filter(q=>q.sec==k).length} 題</span></button>`).join('')}</div>
-  <div class="sec-t">模式</div>
-  <div class="grid" id="modes">${modes.map(([k,t,d])=>`<button class="chip ${cfg.mode==k?'on':''}" data-m="${k}"><b>${t}</b><span>${d}</span></button>`).join('')}</div>
-  <div class="card ${cfg.mode=='exam'?'':'hide'}" id="examOpt" style="margin-top:12px">
-    <div class="row" style="justify-content:space-between"><span>題數</span><b id="nv">${cfg.n}</b></div>
-    <input type="range" min="10" max="80" step="5" value="${cfg.n}" id="nr">
-    <div class="mut">正式學科測驗為 80 題單選，60 分及格。</div>
+  <h2>範圍</h2>
+  <p class="lead">講義第 1–11 頁包含三個工作項目。可以只練其中一區，也可以全選一起刷。</p>
+  <div class="secs">${Object.keys(SEC).map(secCard).join('')}</div>
+  <h2>模式</h2>
+  <p class="lead">建議順序：依序練習 → 隨機刷題 → 錯題本清空 → 模擬測驗。</p>
+  <div class="modes">${MODES.map(([k,t,d])=>`<button class="mode ${cfg.mode==k?'on':''}" data-m="${k}"><b>${t}${k=='wrong'&&wb?` <span class="num" style="display:inline;color:var(--amb)">${wb}</span>`:''}</b><span>${d}</span></button>`).join('')}</div>
+  <div class="opts-box">
+    ${cfg.mode=='exam'?`<div style="display:flex;justify-content:space-between"><span>抽題數</span><b class="num" id="nv" style="font-size:20px">${Math.min(cfg.n,n)} 題</b></div>
+    <input type="range" min="10" max="${Math.max(10,Math.min(80,n))}" step="5" value="${Math.min(cfg.n,n)}" id="nr" aria-label="抽題數">
+    <div class="lead" style="margin:2px 0 8px">正式學科測驗為 80 題單選、60 分及格。</div>`:''}
+    <label class="sw"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}>選項順序也打亂（防止背「答案是 ③」）</label>
   </div>
-  <label class="sw" style="margin:14px 2px"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}> 選項順序也打亂</label>
-  <button class="btn pri" style="width:100%;padding:14px;font-size:17px" id="go">開始</button>
-  <div class="row" style="justify-content:center;margin-top:18px"><button class="btn ghost" id="reset" style="font-size:13px;color:var(--mut)">清除作答紀錄</button></div>`;
-  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length)cfg.secs=[k];persist();home()});
+  <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(q=>cfg.secs.includes(q.sec)).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
+  <div class="foot">作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
-  const nr=$('#nr');nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n;persist()};
+  const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';persist()};
   $('#shuf').onchange=e=>{cfg.shuf=e.target.checked;persist()};
   $('#go').onclick=start;
   $('#reset').onclick=async()=>{if(await ask('確定清除所有作答紀錄與錯題本？')){store.s={};save();home()}};
-  window.scrollTo(0,0);
 }
-function persist(){store.cfg=cfg;save()}
 
 function start(){
   let qs;
@@ -128,31 +239,36 @@ function start(){
 }
 
 function show(){
-  const it=S.qs[S.i], q=it.q, exam=S.mode=='exam';
+  const it=S.qs[S.i], q=it.q, s=SEC[q.sec], exam=S.mode=='exam';
   const answered=it.pick!==null, reveal=answered&&!exam;
   const right=S.qs.filter(x=>x.pick!==null&&x.pick===x.q.ans-1).length, ans=S.qs.filter(x=>x.pick!==null).length;
+  const last=S.i==S.qs.length-1;
   app.innerHTML=`
-  <header><button class="btn ghost" id="back">← 回首頁</button><span class="mut">${exam?`已作答 ${ans}`:`答對 ${right}/${ans}`}</span></header>
-  <div class="qmeta"><span>第 ${S.i+1} / ${S.qs.length} 題</span><span>工作項目 ${q.sec} · 第 ${q.n} 題</span></div>
+  <div class="qtop"><button class="btn" id="back">← 首頁</button>
+    <span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
   <div class="bar"><i style="width:${(S.i+1)/S.qs.length*100}%"></i></div>
-  <div class="card">
+  <article class="qcard" style="--c:${s.c}">
+    <div class="qmeta"><span class="pill"><i></i>工作項目 ${q.sec} · ${s.name}</span><span class="num" style="font-size:15px">${S.i+1} / ${S.qs.length}</span></div>
+    <div class="qmeta" style="margin-top:-4px"><span>題庫第 ${q.n} 題</span>${st(q).w?`<span style="color:var(--amb)">曾答錯 ${st(q).w} 次</span>`:''}</div>
     <div class="stem">${esc(q.stem)}</div>
-    ${q.img?`<div class="fig"><img src="${q.img}" alt="題目附圖"></div>`:''}
+    ${q.img?`<div class="fig"><img src="${q.img}" alt="題目附圖"><small>題目附圖</small></div>`:''}
     <div class="opts">${it.order.map((oi,pos)=>{
       let c='';if(reveal){if(oi===q.ans-1)c='ok';else if(oi===it.pick)c='bad'}else if(exam&&oi===it.pick)c='pick';
-      return `<button class="opt ${c}" data-o="${oi}" ${reveal?'disabled':''}><span class="k">${K[pos]}</span>${q.oimg?`<img class="oimg" src="${q.oimg[oi]}" alt="選項圖">`:`<span>${esc(q.opts[oi])}</span>`}</button>`}).join('')}</div>
-    ${reveal?`<div class="fb ${it.pick===q.ans-1?'ok':'bad'}">${it.pick===q.ans-1?'✔ 答對':'✘ 答錯，正解是 '+K[it.order.indexOf(q.ans-1)]}</div>`:''}
-  </div>`;
+      return `<button class="opt ${c}" data-o="${oi}" ${reveal?'disabled':''}><span class="k">${pos+1}</span>${q.oimg?`<img class="oimg" src="${q.oimg[oi]}" alt="選項${pos+1}">`:`<span>${esc(q.opts[oi])}</span>`}</button>`}).join('')}</div>
+    ${reveal?`<div class="fb ${it.pick===q.ans-1?'ok':'bad'}">${it.pick===q.ans-1?'✔ 答對了':'✘ 答錯，正確答案是第 '+(it.order.indexOf(q.ans-1)+1)+' 個選項，已加入錯題本'}</div>`:''}
+    ${exam&&!answered?`<div class="hint">模擬測驗不會馬上對答案，交卷後一起看。</div>`:''}
+  </article>
+  <div class="hint">電腦可用鍵盤：1–4 作答、Enter 下一題、← 上一題</div>`;
   $('#back').onclick=async()=>{if(S.mode!='exam'||await ask('離開會放棄這次測驗，確定？'))home()};
   app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>pick(+b.dataset.o));
   dock.classList.remove('hide');
-  const last=S.i==S.qs.length-1;
   dockIn.innerHTML=`<button class="btn" id="prev" ${S.i?'':'disabled'}>上一題</button>
    ${exam?`<button class="btn" id="fin">交卷</button>`:''}
-   <button class="btn pri" id="next" ${(!exam&&!answered)?'disabled':''}>${last?(exam?'交卷':'看結果'):'下一題'}</button>`;
+   <button class="btn pri" id="next" ${(!exam&&!answered)?'disabled':''}>${last?(exam?'交卷':'看結果'):'下一題 →'}</button>`;
   $('#prev').onclick=()=>{S.i--;show()};
-  $('#next').onclick=()=>{if(last)finish();else{S.i++;show()}};
-  if(exam)$('#fin').onclick=async()=>{const left=S.qs.filter(x=>x.pick===null).length;if(!left||await ask(`還有 ${left} 題沒作答，確定交卷？`))finish()};
+  const submit=async()=>{const left=S.qs.filter(x=>x.pick===null).length;if(!left||await ask(`還有 ${left} 題沒作答，確定交卷？`))finish()};
+  $('#next').onclick=()=>{if(last){exam?submit():finish()}else{S.i++;show()}};
+  if(exam)$('#fin').onclick=submit;
   window.scrollTo(0,0);
 }
 
@@ -168,38 +284,40 @@ function pick(oi){
   it.pick=oi;record(it.q,oi===it.q.ans-1);show();
 }
 function finish(){
-  if(S.mode=='exam')S.qs.forEach(it=>{if(it.pick!==null)record(it.q,it.pick===it.q.ans-1);else record(it.q,false)});
+  if(S.mode=='exam')S.qs.forEach(it=>record(it.q,it.pick===it.q.ans-1));
   const n=S.qs.length, r=S.qs.filter(x=>x.pick===x.q.ans-1).length, score=Math.round(r/n*100);
   const miss=S.qs.filter(x=>x.pick!==x.q.ans-1);
+  const secs=[...new Set(S.qs.map(x=>x.q.sec))].sort();
   dock.classList.add('hide');
+  const title={seq:'依序練習',random:'隨機刷題',exam:'模擬測驗',wrong:'錯題本'}[S.mode];
   app.innerHTML=`
-  <header><button class="btn ghost" id="back">← 回首頁</button></header>
-  <div class="card" style="text-align:center">
-    <div class="mut">${S.mode=='exam'?'模擬測驗成績':'這一輪結果'}</div>
-    <div class="res-big" style="color:${score>=60?'var(--ok)':'var(--bad)'}">${score}</div>
-    <div>答對 ${r} / ${n} 題${S.mode=='exam'?(score>=60?' · 及格 🎉':' · 未達 60 分'):''}</div>
-    <div class="row" style="justify-content:center;margin-top:12px">
-      <button class="btn pri" id="again">再來一輪</button>
-      ${miss.length?`<button class="btn" id="redo">只重做錯的 ${miss.length} 題</button>`:''}
-    </div>
-  </div>
-  ${miss.length?`<div class="sec-t">錯題檢討</div><div class="card">${miss.map(it=>{const q=it.q;return `<div class="rv">
-    <div><span class="tag">${q.sec}-${q.n}</span>${esc(q.stem)}</div>
-    ${q.img?`<div class="fig" style="margin-top:8px"><img src="${q.img}" alt=""></div>`:''}
-    <div class="mut">你的答案：${it.pick===null?'未作答':K[it.pick]+' '+oh(q,it.pick)}</div>
-    <div style="color:var(--ok);font-weight:600">正解：${K[q.ans-1]} ${oh(q,q.ans-1)}</div></div>`}).join('')}</div>`:''}`;
+  <div class="qtop"><button class="btn" id="back">← 首頁</button><span class="score">${title}</span></div>
+  <section class="res">
+    <div class="mut">${S.mode=='exam'?'測驗成績':'這一輪的得分'}</div>
+    <div class="big num" style="color:${score>=60?'#6fe39a':'#ff8a7a'}">${score}</div>
+    <div>答對 ${r} / ${n} 題${S.mode=='exam'?(score>=60?' · 及格':' · 未達 60 分及格線'):''}</div>
+    ${secs.length>1?`<div class="bysec">${secs.map(k=>{const a=S.qs.filter(x=>x.q.sec==k),b=a.filter(x=>x.pick===x.q.ans-1).length;return `<div style="--c:${SEC[k].c}">工作項目 ${k}<b class="num">${b}/${a.length}</b></div>`}).join('')}</div>`:''}
+    <div class="row"><button class="btn pri" id="again">再來一輪</button>${miss.length?`<button class="btn" id="redo">只重做錯的 ${miss.length} 題</button>`:''}</div>
+  </section>
+  ${miss.length?`<h2>錯題檢討</h2><p class="lead">這些題目都已經加入錯題本。</p>${miss.map(it=>{const q=it.q;return `<div class="rv" style="--c:${SEC[q.sec].c}">
+    <div class="qmeta"><span class="pill"><i></i>${q.sec}-${q.n}</span></div>
+    <div class="q">${esc(q.stem)}</div>
+    ${q.img?`<div class="fig" style="margin:8px 0"><img src="${q.img}" alt=""></div>`:''}
+    <div class="a mine">你的答案：${it.pick===null?'未作答':oh(q,it.pick)}</div>
+    <div class="a right">正確答案：${oh(q,q.ans-1)}</div></div>`}).join('')}`:`<p class="lead" style="text-align:center;margin-top:16px">全對，沒有錯題。</p>`}`;
   $('#back').onclick=home;$('#again').onclick=start;
   if(miss.length)$('#redo').onclick=()=>{S={mode:S.mode=='exam'?'random':S.mode,qs:shuffle(miss).map(it=>({q:it.q,order:it.order,pick:null})),i:0};show()};
   window.scrollTo(0,0);
 }
 document.addEventListener('keydown',e=>{
-  if(!S||!dock.offsetParent||document.querySelector('.modal'))return;
+  if(!S||dock.classList.contains('hide')||document.querySelector('.modal'))return;
   const it=S.qs[S.i];
-  if('1234'.includes(e.key)&&e.key){pick(it.order[+e.key-1])}
+  if(['1','2','3','4'].includes(e.key))pick(it.order[+e.key-1]);
   else if(e.key=='Enter'||e.key=='ArrowRight'){const n=$('#next');if(n&&!n.disabled)n.click()}
   else if(e.key=='ArrowLeft'){const p=$('#prev');if(p&&!p.disabled)p.click()}
 });
 home();
+}
 </script>
 </body>
 </html>
