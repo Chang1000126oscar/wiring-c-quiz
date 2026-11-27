@@ -116,6 +116,11 @@ input[type=range]{width:100%;accent-color:var(--amb)}
 .fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
 .ex{margin-top:10px;padding:12px 14px;border-radius:12px;background:light-dark(#f3f5f2,#141b20);border-left:4px solid var(--amb);font-size:15px;line-height:1.7}
 .ex b{display:block;font-size:13px;color:var(--amb);margin-bottom:2px}
+.chip-t{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-size:13.5px;cursor:pointer;min-height:36px;margin-left:auto}
+.chip-t.on{border-color:var(--ok);color:var(--ok);font-weight:700}
+.fb{flex-wrap:wrap;position:relative;overflow:hidden}
+.stay{margin-left:auto;border:0;background:var(--ok);color:#fff;border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer;min-height:40px}
+.cd{position:absolute;left:0;bottom:0;height:3px;width:100%}.cd i{display:block;height:100%;background:var(--ok);animation:cd 1.2s linear forwards}@keyframes cd{from{width:100%}to{width:0}}
 .hint{color:var(--mut);font-size:12.5px;text-align:center;margin-top:10px}
 .dock{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
 .dock .in{max-width:760px;margin:0 auto;display:flex;gap:8px;justify-content:space-between}
@@ -172,7 +177,7 @@ const oh=(q,i)=>q.oimg?`<img class="oimg sm" src="${q.oimg[i]}" alt="選項${K[i
 const ask=(msg)=>new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="mbox"><div>${esc(msg)}</div><div class="row"><button class="btn" data-a="0">取消</button><button class="btn pri" data-a="1">確定</button></div></div>`;document.body.appendChild(m);m.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{m.remove();res(b.dataset.a=='1')})});
 const toast=(msg)=>{const m=document.createElement('div');m.className='toast';m.textContent=msg;document.body.appendChild(m);setTimeout(()=>m.remove(),2200)};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-let cfg={secs:['01','02','03'],mode:'seq',n:50,shuf:false};
+let cfg={secs:['01','02','03'],mode:'seq',n:50,shuf:false,auto:false};
 Object.assign(cfg,store.cfg||{});
 if(!store.n50){cfg.n=50;store.n50=1;store.cfg=cfg;save()}
 const persist=()=>{store.cfg=cfg;save()};
@@ -221,14 +226,16 @@ function home(){
     ${cfg.mode=='exam'?`<div style="display:flex;justify-content:space-between"><span>抽題數</span><b class="num" id="nv" style="font-size:20px">${Math.min(cfg.n,n)} 題</b></div>
     <input type="range" min="10" max="${Math.max(10,Math.min(80,n))}" step="5" value="${Math.min(cfg.n,n)}" id="nr" aria-label="抽題數">
     <div class="lead" style="margin:2px 0 8px">正式學科測驗為 80 題單選、60 分及格。</div>`:''}
+    <label class="sw"><input type="checkbox" id="auto" ${cfg.auto?'checked':''}>答對自動跳下一題（模擬測驗不適用）</label>
     <label class="sw"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}>選項順序也打亂（防止背「答案是 ③」）</label>
   </div>
   <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(q=>cfg.secs.includes(q.sec)).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
-  <div class="foot">版本 1.3（含詳解）· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 1.4· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
   const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';persist()};
   $('#shuf').onchange=e=>{cfg.shuf=e.target.checked;persist()};
+  $('#auto').onchange=e=>{cfg.auto=e.target.checked;persist()};
   $('#go').onclick=start;
   $('#reset').onclick=async()=>{if(await ask('確定清除所有作答紀錄與錯題本？')){store.s={};save();home()}};
 }
@@ -244,13 +251,14 @@ function start(){
 }
 
 function show(){
+  clearTimeout(S.timer);S.timer=null;
   const it=S.qs[S.i], q=it.q, s=SEC[q.sec], exam=S.mode=='exam';
   const answered=it.pick!==null, reveal=answered&&!exam;
   const right=S.qs.filter(x=>x.pick!==null&&x.pick===x.q.ans-1).length, ans=S.qs.filter(x=>x.pick!==null).length;
   const last=S.i==S.qs.length-1;
   app.innerHTML=`
   <div class="qtop"><button class="btn" id="back">← 首頁</button>
-    <span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
+    ${exam?'':`<button class="chip-t ${cfg.auto?'on':''}" id="autoT" aria-pressed="${cfg.auto}">答對自動跳 ${cfg.auto?'開':'關'}</button>`}<span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
   <div class="bar"><i style="width:${(S.i+1)/S.qs.length*100}%"></i></div>
   <article class="qcard" style="--c:${s.c}">
     <div class="qmeta"><span class="pill"><i></i>工作項目 ${q.sec} · ${s.name}</span><span class="num" style="font-size:15px">${S.i+1} / ${S.qs.length}</span></div>
@@ -266,6 +274,7 @@ function show(){
   <div class="hint">電腦可用鍵盤：1–4 作答、Enter 下一題、← 上一題</div>`;
   $('#back').onclick=async()=>{if(S.mode!='exam'||await ask('離開會放棄這次測驗，確定？'))home()};
   app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>pick(+b.dataset.o));
+  const at=$('#autoT');if(at)at.onclick=()=>{cfg.auto=!cfg.auto;persist();if(!cfg.auto)clearTimeout(S.timer);at.classList.toggle('on',cfg.auto);at.textContent='答對自動跳 '+(cfg.auto?'開':'關');at.setAttribute('aria-pressed',cfg.auto)};
   dock.classList.remove('hide');
   dockIn.innerHTML=`<button class="btn" id="prev" ${S.i?'':'disabled'}>上一題</button>
    ${exam?`<button class="btn" id="fin">交卷</button>`:''}
@@ -286,7 +295,15 @@ function pick(oi){
   const it=S.qs[S.i];
   if(S.mode=='exam'){it.pick=oi;show();return}
   if(it.pick!==null)return;
-  it.pick=oi;record(it.q,oi===it.q.ans-1);show();const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});
+  it.pick=oi;const ok=oi===it.q.ans-1;record(it.q,ok);show();
+  if(ok&&cfg.auto&&S.i<S.qs.length-1){
+    const fb=document.querySelector('.fb');fb.innerHTML='✔ 答對了，馬上跳下一題 <button class="stay" id="stay">停住看詳解</button><span class="cd"><i></i></span>';
+    const ex=document.querySelector('.ex');if(ex)ex.classList.add('hide');
+    S.timer=setTimeout(()=>{S.i++;show()},1200);
+    $('#stay').onclick=()=>{clearTimeout(S.timer);S.timer=null;fb.innerHTML='✔ 答對了';if(ex){ex.classList.remove('hide');ex.scrollIntoView({block:'center',behavior:'smooth'})}};
+    return;
+  }
+  const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});
 }
 function finish(){
   if(S.mode=='exam')S.qs.forEach(it=>record(it.q,it.pick===it.q.ans-1));
