@@ -146,6 +146,18 @@ input[type=range]{width:100%;accent-color:var(--amb)}
 .mbox{background:var(--card);border-radius:18px;padding:20px;max-width:360px;width:100%}
 .mbox .row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--panel);color:#fff;padding:10px 18px;border-radius:99px;z-index:9;font-size:14px}
+@media(min-width:1000px){
+ .wrap.is-home{max-width:1160px}
+ .is-home .panel{border-radius:0 0 26px 26px;padding:30px 32px 26px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;align-items:end}
+ .is-home .panel .meters{margin-top:0}
+ .is-home .panel h1{font-size:44px}
+ .cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:28px;align-items:start}
+ .colB{position:sticky;top:16px}
+ .wrap.is-q{max-width:820px}
+ .is-q .stem{font-size:20px}
+ .is-q .opt{font-size:17px}
+ .is-q .fig img{max-height:260px}
+}
 @media (prefers-reduced-motion:no-preference){.lamp.g,.lamp.y{animation:glow 2.4s ease-in-out infinite}@keyframes glow{50%{filter:brightness(1.18)}}}
 </style>
 </head>
@@ -189,7 +201,7 @@ const pool=()=>ALL.filter(q=>cfg.secs.includes(q.sec));
 const wrongs=()=>ALL.filter(q=>st(q).wb);
 
 function home(){
-  S=null;dock.classList.add('hide');
+  app.className='wrap is-home';S=null;dock.classList.add('hide');
   const done=ALL.filter(q=>st(q).c+st(q).w>0).length;
   const corr=ALL.reduce((a,q)=>a+st(q).c,0), tot=ALL.reduce((a,q)=>a+st(q).c+st(q).w,0);
   const acc=tot?Math.round(corr/tot*100):null, wb=wrongs().length;
@@ -204,9 +216,9 @@ function home(){
   app.innerHTML=`
   <section class="panel">
     <div class="screws"><i></i><i></i></div>
-    <span class="badge">115 年起適用 · 013003A13</span>
+    <div class="ttl"><span class="badge">115 年起適用 · 013003A13</span>
     <h1>工業配線丙級<br>學科刷題</h1>
-    <div class="sub">技術士技能檢定學科題庫 · 工作項目 01–03（講義第 1–11 頁）· 共 ${ALL.length} 題</div>
+    <div class="sub">技術士技能檢定學科題庫 · 工作項目 01–03（講義第 1–11 頁）· 共 ${ALL.length} 題</div></div>
     <div class="meters">
       <div class="meter"><div class="lamp ${done?'g':'off'}"></div><b class="num">${done}<small>/${ALL.length}</small></b><span>做過的題目</span></div>
       <div class="meter"><div class="lamp ${acc===null?'off':acc>=60?'g':'r'}"></div><b class="num">${acc===null?'—':acc+'<small>%</small>'}</b><span>累積正確率</span></div>
@@ -218,9 +230,11 @@ function home(){
     <div class="step"><b class="num">2</b>選一種練習模式</div>
     <div class="step"><b class="num">3</b>按「開始」，錯的會自動進錯題本</div>
   </div>
+  <div class="cols"><div class="colA">
   <h2>範圍</h2>
   <p class="lead">講義第 1–11 頁包含三個工作項目。可以只練其中一區，也可以全選一起刷。</p>
   <div class="secs">${Object.keys(SEC).map(secCard).join('')}</div>
+  </div><div class="colB">
   <h2>模式</h2>
   <p class="lead">建議順序：依序練習 → 隨機刷題 → 錯題本清空 → 模擬測驗。</p>
   <div class="modes">${MODES.map(([k,t,d])=>`<button class="mode ${cfg.mode==k?'on':''}" data-m="${k}"><b>${t}${k=='wrong'&&wb?` <span class="num" style="display:inline;color:var(--amb)">${wb}</span>`:''}</b><span>${d}</span></button>`).join('')}</div>
@@ -232,7 +246,8 @@ function home(){
     <label class="sw"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}>選項順序也打亂（防止背「答案是 ③」）</label>
   </div>
   <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(q=>cfg.secs.includes(q.sec)).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
-  <div class="foot">版本 1.5· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  </div></div>
+  <div class="foot">版本 1.6· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
   const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';persist()};
@@ -253,6 +268,7 @@ function start(){
 }
 
 function show(){
+  app.className='wrap is-q';
   clearTimeout(S.timer);S.timer=null;
   const it=S.qs[S.i], q=it.q, s=SEC[q.sec], exam=S.mode=='exam';
   const answered=it.pick!==null, reveal=answered&&!exam;
@@ -302,6 +318,7 @@ function pick(oi){
   const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});
 }
 function finish(){
+  app.className='wrap is-q';
   if(S.mode=='exam')S.qs.forEach(it=>record(it.q,it.pick===it.q.ans-1));
   const n=S.qs.length, r=S.qs.filter(x=>x.pick===x.q.ans-1).length, score=Math.round(r/n*100);
   const miss=S.qs.filter(x=>x.pick!==x.q.ans-1);
