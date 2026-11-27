@@ -89,6 +89,8 @@ input[type=range]{width:100%;accent-color:var(--amb)}
 .btn{appearance:none;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-size:15px;cursor:pointer;min-height:44px}
 .btn.pri{background:var(--panel);color:#fff;border-color:var(--panel);font-weight:700}
 .btn:disabled{opacity:.4;cursor:default}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .btn.pri{background:#f0a020;border-color:#f0a020;color:#1f2a33}}
+:root[data-theme=dark] .btn.pri{background:#f0a020;border-color:#f0a020;color:#1f2a33}
 .score{font-size:14px;color:var(--mut)}
 .score b{color:var(--ink);font-size:18px}
 .bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
@@ -222,7 +224,7 @@ function home(){
     <label class="sw"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}>選項順序也打亂（防止背「答案是 ③」）</label>
   </div>
   <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(q=>cfg.secs.includes(q.sec)).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
-  <div class="foot">作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 1.3（含詳解）· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
   const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';persist()};
