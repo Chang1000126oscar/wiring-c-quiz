@@ -168,8 +168,9 @@ const oh=(q,i)=>q.oimg?`<img class="oimg sm" src="${q.oimg[i]}" alt="選項${K[i
 const ask=(msg)=>new Promise(res=>{const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="mbox"><div>${esc(msg)}</div><div class="row"><button class="btn" data-a="0">取消</button><button class="btn pri" data-a="1">確定</button></div></div>`;document.body.appendChild(m);m.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{m.remove();res(b.dataset.a=='1')})});
 const toast=(msg)=>{const m=document.createElement('div');m.className='toast';m.textContent=msg;document.body.appendChild(m);setTimeout(()=>m.remove(),2200)};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-let cfg={secs:['01','02','03'],mode:'seq',n:40,shuf:false};
+let cfg={secs:['01','02','03'],mode:'seq',n:50,shuf:false};
 Object.assign(cfg,store.cfg||{});
+if(!store.n50){cfg.n=50;store.n50=1;store.cfg=cfg;save()}
 const persist=()=>{store.cfg=cfg;save()};
 let S=null;
 const st=q=>store.s[q.id]||{c:0,w:0,wb:false};
