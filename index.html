@@ -192,10 +192,7 @@ const SEC = {
  '06':{name:'檢查及故障排除',c:'var(--s06)',desc:'看控制電路圖判斷動作、通電前檢查、換裝器具原則、SSC 與斷路器量測。',tip:'跟術科查修最相關，看圖推動作'}
 };
 const SECK=Object.keys(SEC);
-const PRESETS=[
- {t:'全部 600 題',secs:SECK,rg:{}},
- {t:'第 1 次段考（01、02、03 第 1–13 題）',secs:['01','02','03'],rg:{'03':[1,13]}}
-];
+const PRESETS=[{t:'全部 600 題',secs:SECK,rg:{}}];
 const MODES=[
  ['seq','依序練習','照題庫題號一題一題做，答完立刻對答案並看詳解。適合第一次讀。'],
  ['random','隨機刷題','打亂順序把範圍內全部做一遍，避免靠位置記答案。'],
@@ -214,11 +211,19 @@ const ask=(msg)=>new Promise(res=>{const m=document.createElement('div');m.class
 const toast=(msg)=>{const m=document.createElement('div');m.className='toast';m.textContent=msg;document.body.appendChild(m);setTimeout(()=>m.remove(),2200)};
 const flash=()=>{const m=document.createElement('div');m.className='flash';m.textContent='✔ 答對';document.body.appendChild(m);setTimeout(()=>m.remove(),700)};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
-let cfg={secs:['01','02','03'],rg:{'03':[1,13]},mode:'seq',n:50,shuf:false,auto:false};
+let cfg={secs:[...SECK],rg:{},mode:'seq',n:50,shuf:false,auto:false};
 Object.assign(cfg,store.cfg||{});
 if(!store.n50){cfg.n=50;store.n50=1;store.cfg=cfg;save()}
-if(!store.v2){if(!store.cfg||!store.cfg.rg)cfg.rg={'03':[1,13]};store.v2=1;store.cfg=cfg;save()}
+if(!store.v2){if(store.cfg&&!store.cfg.rg)cfg.rg={'03':[1,13]};store.v2=1;store.cfg=cfg;save()}
 cfg.rg=cfg.rg||{};
+// 範圍連結：#r=01,02,03:1-13
+const rangeStr=()=>cfg.secs.map(k=>cfg.rg[k]?`${k}:${cfg.rg[k][0]}-${cfg.rg[k][1]}`:k).join(',');
+{const m=decodeURIComponent(location.hash).match(/^#r=([0-9,:\-]+)$/);
+ if(m){const secs=[],rg={};
+  m[1].split(',').forEach(x=>{const mm=x.match(/^(0[1-6])(?::(\d+)-(\d+))?$/);if(!mm)return;const k=mm[1];secs.push(k);
+   if(mm[2]){const N=ALL.filter(q=>q.sec==k).length;let a=Math.max(1,Math.min(N,+mm[2])),b=Math.max(1,Math.min(N,+mm[3]));if(a>b)[a,b]=[b,a];if(!(a==1&&b==N))rg[k]=[a,b]}});
+  if(secs.length){cfg.secs=[...new Set(secs)].sort();cfg.rg=rg;store.cfg=cfg;save();store.fromLink=1}
+  history.replaceState(null,'',location.pathname+location.search)}}
 const SN=k=>ALL.filter(q=>q.sec==k).length;
 const inR=q=>{if(!cfg.secs.includes(q.sec))return false;const r=cfg.rg[q.sec];return !r||(q.n>=r[0]&&q.n<=r[1])};
 const fmt=s=>esc(s).replace(/\^\{([^}]*)\}/g,'<sup>$1</sup>').replace(/_\{([^}]*)\}/g,'<sub>$1</sub>');
@@ -263,7 +268,7 @@ function home(){
   <div class="cols"><div class="colA">
   <h2>範圍</h2>
   <p class="lead">勾選要練的工作項目，每一區都可以改題號，只練其中一段。目前範圍共 <b id="pn">${n}</b> 題。</p>
-  <div class="prs">${PRESETS.map((p,i)=>`<button class="pr ${preOn(p)?'on':''}" data-pr="${i}">${p.t}</button>`).join('')}</div>
+  <div class="prs">${PRESETS.map((p,i)=>`<button class="pr ${preOn(p)?'on':''}" data-pr="${i}">${p.t}</button>`).join('')}<button class="pr" id="share">複製這個範圍的連結</button></div>
   <div class="secs">${Object.keys(SEC).map(secCard).join('')}</div>
   </div><div class="colB">
   <h2>模式</h2>
@@ -279,15 +284,17 @@ function home(){
   </div>
   <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(inR).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
   </div></div>
-  <div class="foot">版本 2.0· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 2.1· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
   app.querySelectorAll('[data-pr]').forEach(b=>b.onclick=()=>{const p=PRESETS[+b.dataset.pr];cfg.secs=[...p.secs];cfg.rg=JSON.parse(JSON.stringify(p.rg));persist();home()});
+  $('#share').onclick=async()=>{const u=location.origin+location.pathname+'#r='+rangeStr();
+    try{await navigator.clipboard.writeText(u);toast('已複製範圍連結，貼給同學就好')}catch(e){await ask('複製失敗，請手動複製這個連結：\n'+u)}};
   app.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{delete cfg.rg[b.dataset.full];persist();home()});
   const setR=k=>{const N=SN(k);let a=parseInt($(`[data-ra="${k}"]`).value)||1,b=parseInt($(`[data-rb="${k}"]`).value)||N;a=Math.max(1,Math.min(N,a));b=Math.max(1,Math.min(N,b));if(a>b)[a,b]=[b,a];if(a==1&&b==N)delete cfg.rg[k];else cfg.rg[k]=[a,b];persist();
     const ia=$(`[data-ra="${k}"]`),ib=$(`[data-rb="${k}"]`);if(document.activeElement!==ia)ia.value=a;if(document.activeElement!==ib)ib.value=b;
     const r=cfg.rg[k];$(`[data-rs="${k}"]`).innerHTML=r?`<b>${b-a+1}</b> / ${N} 題`:`全部 ${N} 題`;ia.closest('.rng').classList.toggle('cust',!!r);$(`[data-full="${k}"]`).classList.toggle('hide',!r);
-    const n2=pool().length;$('#pn').textContent=n2;app.querySelectorAll('.pr').forEach((b,i)=>b.classList.toggle('on',preOn(PRESETS[i])));
+    const n2=pool().length;$('#pn').textContent=n2;app.querySelectorAll('[data-pr]').forEach(b=>b.classList.toggle('on',preOn(PRESETS[+b.dataset.pr])));
     $('#go').lastChild.textContent='開始 · '+(cfg.mode=='wrong'?wrongs().filter(inR).length:cfg.mode=='exam'?Math.min(cfg.n,n2):n2)+' 題'};
   app.querySelectorAll('[data-ra],[data-rb]').forEach(i=>{i.onchange=()=>setR(i.dataset.ra||i.dataset.rb);i.onkeydown=e=>{if(e.key=='Enter')i.blur()}});
   const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';app.querySelectorAll('.pre').forEach(b=>b.classList.toggle('on',+b.dataset.n==cfg.n));persist()};
