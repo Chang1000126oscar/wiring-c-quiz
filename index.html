@@ -152,6 +152,16 @@ input[type=range]{width:100%;accent-color:var(--amb)}
 .hint{}
 @media (hover:none){.kbd{display:none}}
 @media(max-width:420px){.rng{padding-left:14px}}
+@media(max-width:600px){
+ .is-q .qtop{padding:8px 0 6px}.is-q .qtop .btn{min-height:40px;padding:8px 12px}
+ .is-q .bar{margin-bottom:8px}
+ .is-q .qcard{padding:12px 12px 14px}
+ .is-q .stem{font-size:17px;line-height:1.55;margin:2px 0 10px}
+ .is-q .fig{padding:6px;margin-bottom:10px}.is-q .fig img{max-height:min(200px,24vh)}.is-q .fig small{margin-top:2px}
+ .is-q .opts{gap:7px}.is-q .opt{min-height:46px;padding:9px 12px;font-size:16px;gap:10px}
+ .is-q .opt .k{width:26px;height:26px;font-size:14px}
+ .is-q .oimg{max-height:min(64px,8vh)}
+}
 .hint{color:var(--mut);font-size:12.5px;text-align:center;margin-top:10px}
 .dock{position:fixed;left:0;right:0;bottom:0;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-top:1px solid var(--line);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
 .dock .in{max-width:760px;margin:0 auto;display:flex;gap:8px;justify-content:space-between}
@@ -302,7 +312,7 @@ function home(){
   </div>
   <button class="go" id="go">開始 · ${cfg.mode=='wrong'?wrongs().filter(inR).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
   </div></div>
-  <div class="foot">版本 2.4 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 2.5 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('請至少選擇一個工作項目')}persist();home()});
   paintM();
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
@@ -349,8 +359,7 @@ function show(){
     <button class="chip-t ${cfg.auto?'on':''}" id="autoT" aria-pressed="${cfg.auto}">自動下一題：${cfg.auto?'開':'關'}</button><span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
   <div class="bar"><i style="width:${(S.i+1)/S.qs.length*100}%"></i></div>
   <article class="qcard" style="--c:${s.c}">
-    <div class="qmeta"><span class="pill"><i></i>工作項目 ${q.sec} · ${s.name}</span><span class="num" style="font-size:15px">${S.i+1} / ${S.qs.length}</span></div>
-    <div class="qmeta" style="margin-top:-4px"><span>題庫第 ${q.n} 題</span>${st(q).w?`<span style="color:var(--amb)">曾答錯 ${st(q).w} 次</span>`:''}</div>
+    <div class="qmeta"><span class="pill"><i></i>${q.sec} ${s.name} · 第 ${q.n} 題</span><span>${st(q).w?`<span style="color:var(--amb)">曾答錯 ${st(q).w} 次</span> · `:''}<span class="num" style="font-size:15px">${S.i+1} / ${S.qs.length}</span></span></div>
     <div class="stem">${fmt(q.stem)}</div>
     ${q.img?`<div class="fig"><img src="${q.img}" alt="題目附圖"><small>題目附圖 · 點擊可放大</small></div>`:''}
     <div class="opts">${it.order.map((oi,pos)=>{
