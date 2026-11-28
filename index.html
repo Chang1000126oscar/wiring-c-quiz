@@ -314,7 +314,7 @@ function home(){
   </div>
   <button class="go" id="go">開始 · ${cfg.mode=='wrong'?wrongs().filter(inR).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
   </div></div>
-  <div class="foot">版本 2.7 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 2.8 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('請至少選擇一個工作項目')}persist();home()});
   paintM();
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
@@ -377,7 +377,7 @@ function show(){
   dock.classList.remove('hide');
   dockIn.innerHTML=`<button class="btn" id="prev" ${S.i?'':'disabled'}>上一題</button>
    ${exam?`<button class="btn" id="fin">交卷</button>`:''}
-   <button class="btn pri" id="next" ${(!exam&&!answered)?'disabled':''}>${last?(exam?'交卷':'查看結果'):'下一題 →'}</button>`;
+   <button class="btn pri" id="next" ${(!exam&&!answered)?'disabled':''}>${last?(exam?'交卷':S.mode=='wrong'?'完成':'查看結果'):'下一題 →'}</button>`;
   $('#prev').onclick=()=>{S.i--;show()};
   const submit=async()=>{const left=S.qs.filter(x=>x.pick===null).length;if(!left||await ask(`尚有 ${left} 題未作答，確定交卷？`))finish()};
   $('#next').onclick=()=>{if(last){exam?submit():finish()}else{S.i++;show()}};
@@ -399,6 +399,7 @@ function pick(oi){
   const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'});
 }
 function finish(){
+  if(S.mode=='wrong'){const left=wrongs().filter(inR).length;home();toast(left?`錯題練習完成，目前範圍尚有 ${left} 題錯題`:'目前範圍的錯題已全部清除');return}
   app.className='wrap is-q';
   if(S.mode=='exam')S.qs.forEach(it=>record(it.q,it.pick===it.q.ans-1));
   const n=S.qs.length, r=S.qs.filter(x=>x.pick===x.q.ans-1).length, score=Math.round(r/n*100);
