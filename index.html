@@ -18,6 +18,8 @@
 --panel:#1f2a33;--panel2:#2a3742;--plate:#eef0ec;
 --ok:#1f9d55;--okbg:light-dark(#e3f5ea,#123222);--bad:#d64535;--badbg:light-dark(#fbe6e3,#3a1714);--amb:#f0a020;
 --s01:#2f74c0;--s02:#d4801a;--s03:#159a8c;--s04:#7a5cc7;--s05:#c2477d;--s06:#5f8a2a}
+html{scrollbar-gutter:stable;overflow-y:scroll}
+.ex,.stem,.opt span{overflow-wrap:anywhere}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;-webkit-tap-highlight-color:transparent;overflow-x:clip}
@@ -312,7 +314,7 @@ function home(){
   </div>
   <button class="go" id="go">開始 · ${cfg.mode=='wrong'?wrongs().filter(inR).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
   </div></div>
-  <div class="foot">版本 2.6 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 2.7 · 作答紀錄僅儲存於本裝置的瀏覽器中。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('請至少選擇一個工作項目')}persist();home()});
   paintM();
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
@@ -394,7 +396,7 @@ function pick(oi){
   if(it.pick!==null)return;
   it.pick=oi;const ok=oi===it.q.ans-1;record(it.q,ok);show();
   if(ok&&cfg.auto&&S.i<S.qs.length-1){S.i++;show();flash();return}
-  const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',behavior:'smooth'});
+  const f=document.querySelector('.ex')||document.querySelector('.fb');if(f)f.scrollIntoView({block:'center',inline:'nearest',behavior:'smooth'});
 }
 function finish(){
   app.className='wrap is-q';
