@@ -116,6 +116,7 @@ input[type=range]{width:100%;accent-color:var(--amb)}
 .fb.ok{background:var(--okbg);color:var(--ok)}.fb.bad{background:var(--badbg);color:var(--bad)}
 .ex{margin-top:10px;padding:12px 14px;border-radius:12px;background:light-dark(#f3f5f2,#141b20);border-left:4px solid var(--amb);font-size:15px;line-height:1.7}
 .ex b{display:block;font-size:13px;color:var(--amb);margin-bottom:2px}
+.presets{display:flex;gap:8px;margin:6px 0 4px}.pre{flex:1;min-height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-weight:700;cursor:pointer}.pre.on{border-color:var(--amb);color:var(--amb)}.pre:disabled{opacity:.35;cursor:default}
 .chip-t{border:1.5px solid var(--line);background:var(--card);border-radius:99px;padding:6px 12px;font-size:13.5px;cursor:pointer;min-height:36px;margin-left:auto}
 .chip-t.on{border-color:var(--ok);color:var(--ok);font-weight:700}
 .fb{flex-wrap:wrap;position:relative;overflow:hidden}
@@ -241,16 +242,18 @@ function home(){
   <div class="opts-box">
     ${cfg.mode=='exam'?`<div style="display:flex;justify-content:space-between"><span>抽題數</span><b class="num" id="nv" style="font-size:20px">${Math.min(cfg.n,n)} 題</b></div>
     <input type="range" min="10" max="${Math.max(10,Math.min(80,n))}" step="5" value="${Math.min(cfg.n,n)}" id="nr" aria-label="抽題數">
-    <div class="lead" style="margin:2px 0 8px">正式學科測驗為 80 題單選、60 分及格。</div>`:''}
-    <label class="sw"><input type="checkbox" id="auto" ${cfg.auto?'checked':''}>答對直接跳下一題（用猜的想看詳解時就關掉；模擬測驗不適用）</label>
+    <div class="presets">${[50,80].map(v=>`<button class="pre ${Math.min(cfg.n,n)==v?'on':''}" data-n="${v}" ${v>n?'disabled':''}>${v} 題</button>`).join('')}</div>
+    <div class="lead" style="margin:2px 0 8px">${n<80?`目前範圍只有 ${n} 題，最多抽 ${n} 題；三區全選才能抽到 80 題。`:'段考預估 50 題，最多 80 題。'}</div>`:''}
+    <label class="sw"><input type="checkbox" id="auto" ${cfg.auto?'checked':''}>${cfg.mode=='exam'?'選完答案直接跳下一題':'答對直接跳下一題（用猜的想看詳解時就關掉）'}</label>
     <label class="sw"><input type="checkbox" id="shuf" ${cfg.shuf?'checked':''}>選項順序也打亂（防止背「答案是 ③」）</label>
   </div>
   <button class="go" id="go"><span class="lamp g"></span>開始 · ${cfg.mode=='wrong'?wrongs().filter(q=>cfg.secs.includes(q.sec)).length:cfg.mode=='exam'?Math.min(cfg.n,n):n} 題</button>
   </div></div>
-  <div class="foot">版本 1.6· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
+  <div class="foot">版本 1.7· 作答紀錄只存在這台裝置的瀏覽器裡。<br><button class="link" id="reset">清除作答紀錄</button></div>`;
   app.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const k=b.dataset.s;cfg.secs=cfg.secs.includes(k)?cfg.secs.filter(x=>x!=k):[...cfg.secs,k].sort();if(!cfg.secs.length){cfg.secs=[k];toast('至少要選一個工作項目')}persist();home()});
   app.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{cfg.mode=b.dataset.m;persist();home()});
-  const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';persist()};
+  const nr=$('#nr');if(nr)nr.oninput=()=>{cfg.n=+nr.value;$('#nv').textContent=cfg.n+' 題';$('#go').lastChild.textContent='開始 · '+cfg.n+' 題';app.querySelectorAll('.pre').forEach(b=>b.classList.toggle('on',+b.dataset.n==cfg.n));persist()};
+  app.querySelectorAll('.pre').forEach(b=>b.onclick=()=>{cfg.n=+b.dataset.n;persist();home()});
   $('#shuf').onchange=e=>{cfg.shuf=e.target.checked;persist()};
   $('#auto').onchange=e=>{cfg.auto=e.target.checked;persist()};
   $('#go').onclick=start;
@@ -276,7 +279,7 @@ function show(){
   const last=S.i==S.qs.length-1;
   app.innerHTML=`
   <div class="qtop"><button class="btn" id="back">← 首頁</button>
-    ${exam?'':`<button class="chip-t ${cfg.auto?'on':''}" id="autoT" aria-pressed="${cfg.auto}">答對自動跳 ${cfg.auto?'開':'關'}</button>`}<span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
+    <button class="chip-t ${cfg.auto?'on':''}" id="autoT" aria-pressed="${cfg.auto}">${exam?'作答自動跳':'答對自動跳'} ${cfg.auto?'開':'關'}</button><span class="score">${exam?`已作答 <b class="num">${ans}</b>/${S.qs.length}`:`答對 <b class="num">${right}</b> / ${ans}`}</span></div>
   <div class="bar"><i style="width:${(S.i+1)/S.qs.length*100}%"></i></div>
   <article class="qcard" style="--c:${s.c}">
     <div class="qmeta"><span class="pill"><i></i>工作項目 ${q.sec} · ${s.name}</span><span class="num" style="font-size:15px">${S.i+1} / ${S.qs.length}</span></div>
@@ -292,7 +295,7 @@ function show(){
   <div class="hint">電腦可用鍵盤：1–4 作答、Enter 下一題、← 上一題</div>`;
   $('#back').onclick=async()=>{if(S.mode!='exam'||await ask('離開會放棄這次測驗，確定？'))home()};
   app.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>pick(+b.dataset.o));
-  const at=$('#autoT');if(at)at.onclick=()=>{cfg.auto=!cfg.auto;persist();if(!cfg.auto)clearTimeout(S.timer);at.classList.toggle('on',cfg.auto);at.textContent='答對自動跳 '+(cfg.auto?'開':'關');at.setAttribute('aria-pressed',cfg.auto)};
+  const at=$('#autoT');if(at)at.onclick=()=>{cfg.auto=!cfg.auto;persist();if(!cfg.auto)clearTimeout(S.timer);at.classList.toggle('on',cfg.auto);at.textContent=(exam?'作答自動跳 ':'答對自動跳 ')+(cfg.auto?'開':'關');at.setAttribute('aria-pressed',cfg.auto)};
   dock.classList.remove('hide');
   dockIn.innerHTML=`<button class="btn" id="prev" ${S.i?'':'disabled'}>上一題</button>
    ${exam?`<button class="btn" id="fin">交卷</button>`:''}
@@ -311,7 +314,7 @@ function record(q,ok){
 }
 function pick(oi){
   const it=S.qs[S.i];
-  if(S.mode=='exam'){it.pick=oi;show();return}
+  if(S.mode=='exam'){it.pick=oi;if(cfg.auto&&S.i<S.qs.length-1)S.i++;show();return}
   if(it.pick!==null)return;
   it.pick=oi;const ok=oi===it.q.ans-1;record(it.q,ok);show();
   if(ok&&cfg.auto&&S.i<S.qs.length-1){S.i++;show();flash();return}
